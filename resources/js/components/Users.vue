@@ -7,7 +7,7 @@ import axios from '../../../public/js/app';
                 <h3 class="card-title">Users Table</h3>
 
                 <div class="card-tools">
-                  <button class="btn btn-success" data-toggle="modal" data-target="#addNew"> <i class="fas fa-user-plus fa-fw"></i>
+                  <button class="btn btn-success" @click="addUserModal"> <i class="fas fa-user-plus fa-fw"></i>
                       Add new user</button>
                 </div>
               </div>
@@ -29,7 +29,7 @@ import axios from '../../../public/js/app';
                     <td>{{user.type | upText}}</td>
                     <td>{{user.created_at | myDate  }}</td>
                     <td>
-                        <a href="#">
+                        <a href="#" @click="editUserModal(user)">
                             <i class="fa fa-edit blue"></i>
                         </a>
                         /
@@ -50,12 +50,13 @@ import axios from '../../../public/js/app';
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Add New</h5>
+        <h5 class="modal-title" v-show="!editmode" id="exampleModalLabel">Add New User</h5>
+        <h5 class="modal-title" v-show="editmode" id="exampleModalLabel">Update user's info</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form @submit.prevent="createUser">
+      <form @submit.prevent="editmode ? updateUser() : createUser()">
       <div class="modal-body">
         <div class="form-group">
             <input v-model="form.name" type="text" name="name" placeholder="Name"
@@ -95,7 +96,8 @@ import axios from '../../../public/js/app';
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Create</button>
+        <button type="submit" v-show="!editmode" class="btn btn-primary">Create</button>
+        <button type="submit" v-show="editmode" class="btn btn-success">Update</button>
       </div>
       </form>
     </div>
@@ -109,8 +111,10 @@ import axios from '../../../public/js/app';
     export default {
         data(){
             return{
+              editmode : true,
               users : {},
                 form : new Form({
+                    id : '',
                     name : '',
                     email : '',
                     password : '',
@@ -121,15 +125,50 @@ import axios from '../../../public/js/app';
             }
         },
         methods:{
-
+          addUserModal(){
+            this.editmode = false;
+            this.form.clear();
+            this.form.reset();
+            $("#addNew").modal('show');
+          },
+          editUserModal(user){
+            this.editmode = true;
+            this.form.clear();
+            this.form.reset();
+            $("#addNew").modal('show');
+            this.form.fill(user);
+          },
           loadUsers(){
             axios.get("api/user").then(({ data }) => (this.users = data.data));
           },
+          updateUser(){
+
+                 this.$Progress.start();
+                 this.form.put('api/user/' + this.form.id)
+                .then(() => {
+                  Fire.$emit('actionDone');
+                  $("#addNew").modal('hide');
+                  toast.fire({
+                    type: 'success',
+                    title: 'User Updated successfully'
+                });
+                  this.$Progress.finish();
+                })
+                .catch(() => {
+                  this.$Progress.fail();
+
+                        toast.fire({
+                        type: 'error',
+                        title: 'Error on updating user'
+                      });
+                })
+          },
           createUser(){
+                
                 this.$Progress.start();
                 this.form.post('api/user')
                 .then(() => {
-                  Fire.$emit('afterCreate');
+                  Fire.$emit('actionDone');
                   $("#addNew").modal('hide');
                   toast.fire({
                     type: 'success',
@@ -138,7 +177,11 @@ import axios from '../../../public/js/app';
                   this.$Progress.finish();
                 })
                 .catch(() => {
-
+                  this.$Progress.fail();
+                  toast.fire({
+                    type: 'error',
+                    title: 'There was something wrong'
+                });
                 })
                 
             },
@@ -159,7 +202,7 @@ import axios from '../../../public/js/app';
                         'Your file has been deleted.',
                         'success'
                       )
-                      Fire.$emit('afterCreate');
+                      Fire.$emit('actionDone');
                       }).catch(() => {
                         swal.fire(
                         'failed!',
@@ -174,7 +217,7 @@ import axios from '../../../public/js/app';
         },
         created() {
             this.loadUsers();
-            Fire.$on('afterCreate',() => {
+            Fire.$on('actionDone',() => {
               this.loadUsers();
             });
         }
