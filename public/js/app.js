@@ -54484,7 +54484,7 @@ process.umask = function() { return 0; };
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
-* sweetalert2 v8.2.2
+* sweetalert2 v8.2.3
 * Released under the MIT License.
 */
 (function (global, factory) {
@@ -54854,7 +54854,7 @@ var hide = function hide(elem) {
 }; // borrowed from jquery $(elem).is(':visible') implementation
 
 var isVisible = function isVisible(elem) {
-  return elem && (elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length);
+  return !!(elem && (elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length));
 };
 var contains = function contains(haystack, needle) {
   if (typeof haystack.contains === 'function') {
@@ -55274,8 +55274,8 @@ var renderTitle = function renderTitle(params) {
  * Global function to determine if SweetAlert2 popup is shown
  */
 
-var isVisible$1 = function isVisible() {
-  return !!getPopup();
+var isVisible$1 = function isVisible$$1() {
+  return isVisible(getPopup());
 };
 /*
  * Global function to click 'Confirm' button
@@ -57048,7 +57048,7 @@ Object.keys(instanceMethods).forEach(function (key) {
   };
 });
 SweetAlert.DismissReason = DismissReason;
-SweetAlert.version = '8.2.2';
+SweetAlert.version = '8.2.3';
 
 var Swal = SweetAlert;
 Swal.default = Swal;
@@ -73857,8 +73857,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\Users\LMHeydi-RC2K\Desktop\myapps\app\larastart\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! C:\Users\LMHeydi-RC2K\Desktop\myapps\app\larastart\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\Users\Mehdi\Desktop\myapps\larastart\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\Users\Mehdi\Desktop\myapps\larastart\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })
