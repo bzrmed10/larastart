@@ -49,7 +49,18 @@ class UserController extends Controller
         ]); 
 
     }
+/**
+     * Display the specified resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function profile()
+    {
+        return auth('api')->user();
+    }
 
+
+    
     /**
      * Display the specified resource.
      *
@@ -82,6 +93,28 @@ class UserController extends Controller
         return ['message' => 'User updated'];
     }
 
+    public function UpdateProfile(Request $request)
+    {
+        $user =  auth('api')->user();
+        $this -> validate($request,[
+            'name' => 'required|string|max:191',
+            'email' => 'required|string|email|max:191|unique:users,email,'.$user->id,
+            'password' =>'sometimes|string|min:6' 
+        ]);
+        $currentPhoto = $user->photo;
+
+        if($request->photo != $currentPhoto){
+            $name = time().'.'.explode('/',
+            explode(':',
+            substr($request->photo,0,
+            strpos($request->photo,';')))[1])[1];
+            \Image::make($request->photo)->save(public_path('img/profile/').$name);
+            $request->merge(['photo' => $name]);
+        }
+        
+        $user->update($request->All()); 
+        return  ['message' => 'success'];
+    }
     /**
      * Remove the specified resource from storage.
      *
