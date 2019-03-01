@@ -20,7 +20,7 @@ import axios from '../../../public/js/app';
                 <h5 class="widget-user-desc">Web Designer</h5>
               </div>
               <div class="widget-user-image">
-                <img class="img-circle" src="" alt="User Avatar">
+                <img class="img-circle" :src="getProfilePhoto()" alt="User">
               </div>
               <div class="card-footer">
                 <div class="row">
@@ -74,14 +74,17 @@ import axios from '../../../public/js/app';
                         <label for="inputName" class="col-sm-12 control-label">Name</label>
 
                         <div class="col-sm-12">
-                          <input type="text" v-model="form.name" class="form-control" placeholder="Name">
+                          <input type="text" v-model="form.name" class="form-control" placeholder="Name":class="{ 'is-invalid': form.errors.has('name') }">
+                           <has-error :form="form" field="name"></has-error>
                         </div>
                       </div>
                       <div class="form-group">
                         <label for="inputEmail"  class="col-sm-12 control-label">Email</label>
 
                         <div class="col-sm-12">
-                          <input type="email" v-model="form.email" class="form-control"  placeholder="Email">
+                          <input type="email" v-model="form.email" class="form-control" 
+                           placeholder="Email":class="{ 'is-invalid': form.errors.has('email') }">
+                           <has-error :form="form" field="email"></has-error>
                         </div>
                       </div>
    
@@ -89,7 +92,9 @@ import axios from '../../../public/js/app';
                         <label for="inputBio" class="col-sm-12 control-label">Experience</label>
 
                         <div class="col-sm-12">
-                          <textarea class="form-control" v-model="form.bio"  placeholder="Bio"></textarea>
+                          <textarea class="form-control" v-model="form.bio"  placeholder="Bio"
+                          :class="{ 'is-invalid': form.errors.has('bio') }"></textarea>
+                            <has-error :form="form" field="bio"></has-error>
                         </div>
                       </div>
                       <div class="form-group">
@@ -103,7 +108,9 @@ import axios from '../../../public/js/app';
                         <label for="inputPass" class="col-sm-12 control-label">Password (leave empty if not changing)</label>
 
                         <div class="col-sm-12">
-                          <input class="form-control" v-model="form.password" type="password" id="inputExperience" placeholder="Password">
+                          <input class="form-control" v-model="form.password" type="password" id="inputExperience" 
+                          placeholder="Password" :class="{ 'is-invalid': form.errors.has('password') }">
+                        <has-error :form="form" field="password"></has-error>
                         </div>
                       </div>
                        <div class="form-group">
@@ -142,8 +149,15 @@ import axios from '../../../public/js/app';
             console.log('Component mounted.')
         },
         methods:{
+          getProfilePhoto(){
+                let photo = (this.form.photo.length > 200) ? this.form.photo : "img/profile/"+ this.form.photo ;
+                return photo;
+            },
           updateInfo(){
             this.$Progress.start();
+            if(this.form.password == ''){
+                    this.form.password = undefined;
+                }
             this.form.put('api/profile')
                 .then(() => {
                     this.$Progress.finish();

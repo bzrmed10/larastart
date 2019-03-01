@@ -88,7 +88,10 @@ class UserController extends Controller
             'email' => 'required|string|email|max:191|unique:users,email,'.$user->id,
             'password' =>'sometimes|string|min:6' 
         ]);
-          
+
+        if(!empty($request->password)){
+            $request->merge(['password' => Hash::make($request['password'])]);
+        }
         $user -> update($request -> all());
         return ['message' => 'User updated'];
     }
@@ -110,6 +113,15 @@ class UserController extends Controller
             strpos($request->photo,';')))[1])[1];
             \Image::make($request->photo)->save(public_path('img/profile/').$name);
             $request->merge(['photo' => $name]);
+
+            $userPhoto = public_path('img/profile/').$currentPhoto;
+            if(file_exists($userPhoto)){
+                @unlink($userPhoto);
+            }
+        }
+        
+        if(!empty($request->password)){
+            $request->merge(['password' => Hash::make($request['password'])]);
         }
         
         $user->update($request->All()); 
